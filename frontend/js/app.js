@@ -7,23 +7,33 @@ if (!currentUser) {
   window.location.href = 'login.html';
 }
 
-// Load quotes
-fetch('quotes.json')
+// Determine backend URL (Docker service name or localhost)
+const BACKEND_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'http://backend:5000';
+
+// Load quotes from backend
+fetch(`${BACKEND_URL}/quotes`)
   .then(res => res.json())
   .then(data => {
     quotes = data;
     displayQuoteOfTheDay();
-  });
+  })
+  .catch(err => console.error('Failed to load quotes:', err));
 
 function displayQuoteOfTheDay() {
   const today = new Date().toISOString().slice(0, 10);
   todayQuote = quotes.find(q => q.date === today) || quotes[Math.floor(Math.random() * quotes.length)];
   const container = document.getElementById('quote-container');
-  if(container) container.innerHTML = `<blockquote>${todayQuote.text}</blockquote><p><em>${todayQuote.reference}</em></p>`;
+  if (container) {
+    container.innerHTML = `<blockquote>${todayQuote.text}</blockquote>
+                           <p><em>${todayQuote.reference}</em></p>`;
+  }
 }
 
+// Save quote for the user (localStorage)
 const saveBtn = document.getElementById('save-quote');
-if(saveBtn) {
+if (saveBtn) {
   saveBtn.addEventListener('click', () => {
     if (!todayQuote) return;
     let saved = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
