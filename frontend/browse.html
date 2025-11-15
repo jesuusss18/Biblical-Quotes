@@ -1,0 +1,34 @@
+<!-- Add your browse page HTML here -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Browse Quotes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Biblical Quotes</h1>
+    <nav>
+      <a href="index.html">Today</a> |
+      <a href="favorites.html">My Favorites</a>
+    </nav>
+  </header>
+  <main>
+    <h2>All Quotes</h2>
+    <div id="quotes-list"></div>
+  </main>
+  <script>
+    fetch('quotes.json')
+      .then(res => res.json())
+      .then(quotes => {
+        const container = document.getElementById('quotes-list');
+        quotes.forEach(q => {
+          const block = document.createElement('div');
+          block.innerHTML = `<blockquote>${q.text}</blockquote><p><em>${q.reference}</em></p>`;
+          container.appendChild(block);
+        });
+      });
+  </script>
+</body>
+</html>

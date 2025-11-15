@@ -1,0 +1,35 @@
+<!-- Add your favorites page HTML here -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Favorites</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Biblical Quotes</h1>
+    <nav>
+      <a href="index.html">Today</a> |
+      <a href="browse.html">Browse</a>
+    </nav>
+  </header>
+  <main>
+    <h2>Saved Quotes</h2>
+    <div id="favorites-container"></div>
+  </main>
+  <script>
+    const container = document.getElementById('favorites-container');
+    const saved = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    if (saved.length === 0) {
+      container.innerHTML = '<p>No saved quotes yet.</p>';
+    } else {
+      saved.forEach(q => {
+        const block = document.createElement('div');
+        block.innerHTML = `<blockquote>${q.text}</blockquote><p><em>${q.reference}</em></p>`;
+        container.appendChild(block);
+      });
+    }
+  </script>
+</body>
+</html>

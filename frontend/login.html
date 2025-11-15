@@ -1,0 +1,36 @@
+<!-- Add your login page HTML here -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login / Signup</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Biblical Quotes</h1>
+    <nav>
+      <a href="index.html">Today</a> |
+      <a href="browse.html">Browse</a> |
+      <a href="favorites.html">My Favorites</a>
+    </nav>
+  </header>
+  <main>
+    <h2>Login / Signup</h2>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <button type="submit">Login / Signup</button>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      localStorage.setItem('currentUser', user);
+      alert('Logged in as ' + user);
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
