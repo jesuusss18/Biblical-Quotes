@@ -37,16 +37,13 @@
   </div>
 
   <script>
-    // --- SPA Routing ---
+  window.addEventListener("DOMContentLoaded", () => {
     function showPage() {
       const path = window.location.pathname;
       const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
       Object.values(pages).forEach(id => document.getElementById(id).style.display = "none");
       const pageId = pages[path] || "home";
       document.getElementById(pageId).style.display = "block";
-      updateNav();
-      if(pageId === "home") displayQuoteOfTheDay();
-      if(pageId === "favorites") displayFavorites();
     }
 
     window.onpopstate = showPage;
@@ -58,72 +55,9 @@
       });
     });
 
-    function updateNav() {
-      const currentUser = localStorage.getItem("currentUser");
-      document.getElementById("nav-login").style.display = currentUser ? "none" : "inline";
-      document.getElementById("logout-btn").style.display = currentUser ? "inline" : "none";
-    }
-
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      localStorage.removeItem("currentUser");
-      showPage();
-    });
-
-    // --- Login ---
-    const loginBtn = document.getElementById("login-btn");
-    loginBtn.addEventListener("click", () => {
-      const username = document.getElementById("username").value.trim();
-      if(username) {
-        localStorage.setItem("currentUser", username);
-        history.pushState(null, "", "/");
-        showPage();
-      } else alert("Enter a username");
-    });
-
-    // --- Backend URL ---
-    const BACKEND_URL = window.VITE_API_URL || 
-      (window.location.hostname === "localhost" ? "http://localhost:5000" : "https://biblical-backend-992642845650.us-central1.run.app");
-
-    // --- Quotes ---
-    let quotes = [];
-    let todayQuote = null;
-
-    function loadQuotes() {
-      fetch(`${BACKEND_URL}/quotes`)
-        .then(res => res.json())
-        .then(data => { quotes = data; displayQuoteOfTheDay(); })
-        .catch(err => console.error("Failed to load quotes:", err));
-    }
-
-    function displayQuoteOfTheDay() {
-      const currentUser = localStorage.getItem("currentUser");
-      if(!currentUser) return;
-      const today = new Date().toISOString().slice(0,10);
-      todayQuote = quotes.find(q => q.date === today) || quotes[Math.floor(Math.random()*quotes.length)];
-      const container = document.getElementById("quote-container");
-      if(container) container.innerHTML = `<blockquote>${todayQuote.text}</blockquote><p><em>${todayQuote.reference}</em></p>`;
-    }
-
-    const saveBtn = document.getElementById("save-quote");
-    saveBtn.addEventListener("click", () => {
-      if(!todayQuote) return;
-      let saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
-      if(!saved.some(q => q.id === todayQuote.id)) {
-        saved.push(todayQuote);
-        localStorage.setItem("savedQuotes", JSON.stringify(saved));
-        alert("Quote saved!");
-      } else alert("Already saved");
-    });
-
-    function displayFavorites() {
-      const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
-      const list = document.getElementById("favorites-list");
-      list.innerHTML = saved.map(q => `<li>${q.text} - <em>${q.reference}</em></li>`).join("");
-    }
-
-    // --- Init ---
-    if(localStorage.getItem("currentUser")) loadQuotes();
     showPage();
-  </script>
+  });
+</script>
+
 </body>
 </html>
