@@ -21,8 +21,11 @@
   <!-- Pages -->
   <div id="home" class="page">
     <h2>Quote of the Day</h2>
-    <div id="quote-container"></div>
-    <button id="save-quote">Save Quote</button>
+    <div id="today-quote">Loading today's quote...</div>
+    <div style="margin-top:8px;">
+      <button id="new-random-quote">New Random Quote</button>
+      <button id="save-random-fav">Save to Favorites</button>
+    </div>
   </div>
 
   <div id="favorites" class="page">
@@ -36,6 +39,7 @@
     <button id="login-btn">Login</button>
   </div>
 
+  <script src="js/app.js"></script>
   <script>
   window.addEventListener("DOMContentLoaded", () => {
     function showPage() {

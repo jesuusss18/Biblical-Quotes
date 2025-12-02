@@ -87,6 +87,36 @@
     el.randomContainer.innerHTML = renderQuoteCard(currentRandom);
   }
 
+  // Quote of the day (deterministic based on date)
+  function getQuoteOfDay() {
+    if (!QUOTES || QUOTES.length === 0) return null;
+    // Prefer an explicit date match in the quotes data (format: YYYY-MM-DD)
+    const now = new Date();
+    const iso = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}-${String(now.getUTCDate()).padStart(2,'0')}`;
+    const byDate = QUOTES.find(q => q.date === iso);
+    if (byDate) return byDate;
+
+    // If there's no explicit quote for today, fall back to a deterministic hash selection
+    const key = iso;
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = ((hash << 5) - hash) + key.charCodeAt(i);
+      hash |= 0; // convert to 32bit int
+    }
+    const idx = Math.abs(hash) % QUOTES.length;
+    return QUOTES[idx];
+  }
+
+  function renderToday() {
+    const todayQuote = getQuoteOfDay();
+    // prefer a dedicated today container if present
+    const todayEl = document.getElementById('today-quote') || el.randomContainer;
+    if (!todayEl) return;
+    todayEl.innerHTML = renderQuoteCard(todayQuote);
+    // keep currentRandom in sync if randomContainer is used
+    if (todayEl === el.randomContainer) currentRandom = todayQuote;
+  }
+
   function renderRecent(limit = 6) {
     if (!el.recentList) return;
     const items = QUOTES.slice(0, limit);
@@ -227,9 +257,10 @@
     if (el.clearFavoritesBtn) el.clearFavoritesBtn.addEventListener('click', clearFavorites);
     if (el.loginForm) el.loginForm.addEventListener('submit', handleLoginSubmit);
 
-    // Fetch quotes and render initial UI
-    await fetchQuotes();
-    renderRandom();
+  // Fetch quotes and render initial UI
+  await fetchQuotes();
+  // render today's quote (prefers explicit date match)
+  renderToday();
     renderRecent();
     renderQuotesList(QUOTES);
     renderFavorites();
