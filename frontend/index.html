@@ -2,24 +2,128 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Biblical Quotes</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Biblical Quotes App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    nav a { margin-right: 10px; }
+    .page { display: none; }
+    blockquote { font-style: italic; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Biblical Quotes</h1>
-    <nav>
-      <a href="index.html">Today</a> |
-      <a href="browse.html">Browse</a> |
-      <a href="favorites.html">My Favorites</a> |
-      <a href="login.html">Login/Signup</a>
-    </nav>
-  </header>
-  <main>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/favorites">Favorites</a>
+    <a href="/login" id="nav-login">Login</a>
+    <a href="#" id="logout-btn" style="display:none;">Logout</a>
+  </nav>
+
+  <!-- Pages -->
+  <div id="home" class="page">
     <h2>Quote of the Day</h2>
     <div id="quote-container"></div>
     <button id="save-quote">Save Quote</button>
-  </main>
-  <script src="js/app.js"></script>
+  </div>
+
+  <div id="favorites" class="page">
+    <h2>My Favorites</h2>
+    <ul id="favorites-list"></ul>
+  </div>
+
+  <div id="login" class="page">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Enter username">
+    <button id="login-btn">Login</button>
+  </div>
+
+  <script>
+    // --- SPA Routing ---
+    function showPage() {
+      const path = window.location.pathname;
+      const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
+      Object.values(pages).forEach(id => document.getElementById(id).style.display = "none");
+      const pageId = pages[path] || "home";
+      document.getElementById(pageId).style.display = "block";
+      updateNav();
+      if(pageId === "home") displayQuoteOfTheDay();
+      if(pageId === "favorites") displayFavorites();
+    }
+
+    window.onpopstate = showPage;
+    document.querySelectorAll("a[href^='/']").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        history.pushState(null, "", link.getAttribute("href"));
+        showPage();
+      });
+    });
+
+    function updateNav() {
+      const currentUser = localStorage.getItem("currentUser");
+      document.getElementById("nav-login").style.display = currentUser ? "none" : "inline";
+      document.getElementById("logout-btn").style.display = currentUser ? "inline" : "none";
+    }
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("currentUser");
+      showPage();
+    });
+
+    // --- Login ---
+    const loginBtn = document.getElementById("login-btn");
+    loginBtn.addEventListener("click", () => {
+      const username = document.getElementById("username").value.trim();
+      if(username) {
+        localStorage.setItem("currentUser", username);
+        history.pushState(null, "", "/");
+        showPage();
+      } else alert("Enter a username");
+    });
+
+    // --- Backend URL ---
+    const BACKEND_URL = window.VITE_API_URL || 
+      (window.location.hostname === "localhost" ? "http://localhost:5000" : "https://biblical-backend-992642845650.us-central1.run.app");
+
+    // --- Quotes ---
+    let quotes = [];
+    let todayQuote = null;
+
+    function loadQuotes() {
+      fetch(`${BACKEND_URL}/quotes`)
+        .then(res => res.json())
+        .then(data => { quotes = data; displayQuoteOfTheDay(); })
+        .catch(err => console.error("Failed to load quotes:", err));
+    }
+
+    function displayQuoteOfTheDay() {
+      const currentUser = localStorage.getItem("currentUser");
+      if(!currentUser) return;
+      const today = new Date().toISOString().slice(0,10);
+      todayQuote = quotes.find(q => q.date === today) || quotes[Math.floor(Math.random()*quotes.length)];
+      const container = document.getElementById("quote-container");
+      if(container) container.innerHTML = `<blockquote>${todayQuote.text}</blockquote><p><em>${todayQuote.reference}</em></p>`;
+    }
+
+    const saveBtn = document.getElementById("save-quote");
+    saveBtn.addEventListener("click", () => {
+      if(!todayQuote) return;
+      let saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
+      if(!saved.some(q => q.id === todayQuote.id)) {
+        saved.push(todayQuote);
+        localStorage.setItem("savedQuotes", JSON.stringify(saved));
+        alert("Quote saved!");
+      } else alert("Already saved");
+    });
+
+    function displayFavorites() {
+      const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
+      const list = document.getElementById("favorites-list");
+      list.innerHTML = saved.map(q => `<li>${q.text} - <em>${q.reference}</em></li>`).join("");
+    }
+
+    // --- Init ---
+    if(localStorage.getItem("currentUser")) loadQuotes();
+    showPage();
+  </script>
 </body>
 </html>
