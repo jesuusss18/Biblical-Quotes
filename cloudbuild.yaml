@@ -1,5 +1,5 @@
 steps:
-  # Build the frontend Docker image using the API URL
+  # Build frontend Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       [
@@ -11,11 +11,11 @@ steps:
         './frontend'
       ]
 
-  # Push the image to Container Registry
+  # Push frontend image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/biblical-frontend']
 
-  # Deploy the image to Cloud Run
+  # Deploy frontend to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       [
