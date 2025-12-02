@@ -121,3 +121,25 @@ blockquote::before {
   padding-top: 10px;
   border-top: 1px dashed #e0e0e0; /* Subtle visual separator */
 }
+
+/* Additional card styles for quote-of-the-day and lists */
+#today-quote, .quote-card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  padding: 18px;
+  margin: 12px 0;
+}
+.quote-text { font-size: 1.125rem; margin: 0 0 8px; color: var(--color-primary); }
+.quote-meta { color: #666; font-size: 0.95rem; margin: 0 }
+.quote-actions { margin-top: 10px }
+button { background: var(--color-primary); color: var(--color-light-text); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer }
+
+/* Fav list */
+#favorites-list { list-style: none; padding-left: 0 }
+#favorites-list li { margin-bottom: 10px }
+
+@media (min-width: 800px) {
+  main { padding: 60px 20px }
+  .quote-container { padding: 48px }
+}

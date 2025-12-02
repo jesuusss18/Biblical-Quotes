@@ -1,276 +1,138 @@
-// Minimal frontend logic for Biblical Quotes app.
-// - Fetches quotes from /api/quotes (recommended) or falls back to /backend/quotes.json
-// - Renders random quote, browse, favorites, simple login stub
-// - Favorites are stored in localStorage as an array of quote IDs
+// ==========================
+// Biblical Quotes App JS
+// ==========================
 
-(() => {
-  const API_BASE = '/api/quotes'; // primary API endpoint
-  const FALLBACK_JSON = '/backend/quotes.json'; // static fallback if no backend
+const quotes = [
+  {"id":1,"text":"For God so loved the world...","reference":"John 3:16","date":"2025-12-12","category":"Love"},
+  {"id":2,"text":"Trust in the LORD with all your heart...","reference":"Proverbs 3:5","date":"2025-11-09","category":"Faith"},
+  {"id":3,"text":"The Lord is my shepherd...","reference":"Psalm 23:1","date":"2025-11-10","category":"Guidance"},
+  {"id":25,"text":"Love does no harm to a neighbor. Therefore love is the fulfillment of the law.","reference":"Romans 13:10","date":"2025-12-02","category":"Love"},
+  // add all other quotes here...
+];
 
-  // DOM elements (may or may not exist on the current page)
-  const el = {
-    randomContainer: document.getElementById('random-quote-container'),
-    newRandomBtn: document.getElementById('new-random-quote'),
-    saveRandomFavBtn: document.getElementById('save-random-fav'),
-    recentList: document.getElementById('recent-quotes-list'),
-    quotesContainer: document.getElementById('quotes-container'),
-    searchInput: document.getElementById('search-input'),
-    searchBtn: document.getElementById('search-btn'),
-    bookSelect: document.getElementById('book-select'),
-    filterBtn: document.getElementById('filter-btn'),
-    favoritesList: document.getElementById('favorites-list'),
-    clearFavoritesBtn: document.getElementById('clear-favorites'),
-    loginForm: document.getElementById('login-form'),
-    loginMessage: document.getElementById('login-message'),
-  };
+let todayQuote = null;
 
-  let QUOTES = []; // cached quotes
-  let currentRandom = null;
-  let favorites = loadFavorites();
+// DOM Elements
+const todayQuoteDiv = document.getElementById("today-quote");
+const newRandomBtn = document.getElementById("new-random-quote");
+const saveBtn = document.getElementById("save-random-fav");
+const favoritesList = document.getElementById("favorites-list");
 
-  // Fetch quotes (try API, fallback to static JSON)
-  async function fetchQuotes() {
-    try {
-      const res = await fetch(API_BASE);
-      if (!res.ok) throw new Error('API fetch failed');
-      const data = await res.json();
-      // If router returns paginated results, extract results
-      QUOTES = Array.isArray(data) ? data : data.results || [];
-    } catch (err) {
-      console.warn('API fetch failed, trying fallback JSON:', err.message);
-      try {
-        const res = await fetch(FALLBACK_JSON);
-        QUOTES = await res.json();
-      } catch (err2) {
-        console.error('Fallback fetch failed:', err2);
-        QUOTES = [];
-      }
-    }
-    populateBookSelect();
-  }
+// ----------------------------
+// Display Quote of the Day
+// ----------------------------
+function displayQuote(quote) {
+  if (!todayQuoteDiv || !quote) return;
+  todayQuoteDiv.innerHTML = `<blockquote>${quote.text}</blockquote><p><em>${quote.reference}</em></p>`;
+}
 
-  // Utilities
-  function randomItem(arr) {
-    if (!arr || arr.length === 0) return null;
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
+function pickTodayQuote() {
+  const today = new Date().toISOString().slice(0, 10);
+  todayQuote = quotes.find(q => q.date === today) || quotes[Math.floor(Math.random() * quotes.length)];
+  displayQuote(todayQuote);
+}
 
-  function renderQuoteCard(quote) {
-    if (!quote) return '<div class="quote-card empty">No quote</div>';
-    // Accept either API shape or local shape
-    const id = quote.id ?? quote._id ?? quote.book + '|' + (quote.chapter_verse || quote.verse || '');
-    const text = quote.text || quote.quote || '';
-    const book = quote.book || '';
-    const chapter = quote.chapter_verse || quote.verse || '';
-    const author = quote.author?.name || (quote.author || '');
-    const favBtnText = isFavorite(id) ? 'Remove Favorite' : 'Save Favorite';
-
-    return `
-      <article class="quote-card" data-id="${id}">
-        <p class="quote-text">${escapeHtml(text)}</p>
-        <p class="quote-meta">${escapeHtml(book)} ${escapeHtml(chapter)} ${author ? '— ' + escapeHtml(author) : ''}</p>
-        <div class="quote-actions">
-          <button class="fav-toggle" data-id="${id}">${favBtnText}</button>
-        </div>
-      </article>
-    `;
-  }
-
-  function escapeHtml(str) {
-    return String(str || '').replace(/[&<>"']/g, (s) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-  }
-
-  // Render functions
-  function renderRandom() {
-    currentRandom = randomItem(QUOTES);
-    if (!el.randomContainer) return;
-    el.randomContainer.innerHTML = renderQuoteCard(currentRandom);
-  }
-
-  // Quote of the day (deterministic based on date)
-  function getQuoteOfDay() {
-    if (!QUOTES || QUOTES.length === 0) return null;
-    // Prefer an explicit date match in the quotes data (format: YYYY-MM-DD)
-    const now = new Date();
-    const iso = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}-${String(now.getUTCDate()).padStart(2,'0')}`;
-    const byDate = QUOTES.find(q => q.date === iso);
-    if (byDate) return byDate;
-
-    // If there's no explicit quote for today, fall back to a deterministic hash selection
-    const key = iso;
-    let hash = 0;
-    for (let i = 0; i < key.length; i++) {
-      hash = ((hash << 5) - hash) + key.charCodeAt(i);
-      hash |= 0; // convert to 32bit int
-    }
-    const idx = Math.abs(hash) % QUOTES.length;
-    return QUOTES[idx];
-  }
-
-  function renderToday() {
-    const todayQuote = getQuoteOfDay();
-    // prefer a dedicated today container if present
-    const todayEl = document.getElementById('today-quote') || el.randomContainer;
-    if (!todayEl) return;
-    todayEl.innerHTML = renderQuoteCard(todayQuote);
-    // keep currentRandom in sync if randomContainer is used
-    if (todayEl === el.randomContainer) currentRandom = todayQuote;
-  }
-
-  function renderRecent(limit = 6) {
-    if (!el.recentList) return;
-    const items = QUOTES.slice(0, limit);
-    el.recentList.innerHTML = items.map(renderQuoteCard).join('');
-  }
-
-  function renderQuotesList(list) {
-    if (!el.quotesContainer) return;
-    if (!list || list.length === 0) {
-      el.quotesContainer.innerHTML = '<p>No quotes found.</p>';
-      return;
-    }
-    el.quotesContainer.innerHTML = list.map(renderQuoteCard).join('');
-  }
-
-  function renderFavorites() {
-    if (!el.favoritesList) return;
-    const favQuotes = QUOTES.filter(q => favorites.includes((q.id ?? q._id ?? q.book + '|' + (q.chapter_verse || q.verse || ''))));
-    if (favQuotes.length === 0) {
-      el.favoritesList.innerHTML = '<p>No favorites yet.</p>';
-      return;
-    }
-    el.favoritesList.innerHTML = favQuotes.map(renderQuoteCard).join('');
-  }
-
-  // Favorites management using localStorage
-  function loadFavorites() {
-    try {
-      const raw = localStorage.getItem('bib_favorites');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function saveFavorites() {
-    localStorage.setItem('bib_favorites', JSON.stringify(favorites));
-  }
-
-  function isFavorite(id) {
-    if (!id) return false;
-    return favorites.indexOf(String(id)) !== -1;
-  }
-
-  function toggleFavorite(id) {
-    id = String(id);
-    const idx = favorites.indexOf(id);
-    if (idx === -1) favorites.push(id);
-    else favorites.splice(idx, 1);
-    saveFavorites();
-    // Re-render the current page parts
-    renderRandom();
-    renderRecent();
-    renderQuotesList(currentFilterList || QUOTES);
+// ----------------------------
+// Save quote to favorites
+// ----------------------------
+function saveQuote() {
+  if (!todayQuote) return;
+  const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
+  if (!saved.some(q => q.id === todayQuote.id)) {
+    saved.push(todayQuote);
+    localStorage.setItem("savedQuotes", JSON.stringify(saved));
+    alert("Quote saved!");
     renderFavorites();
-  }
-
-  // Simple search and filter
-  let currentFilterList = null;
-  function doSearch(term) {
-    if (!term) {
-      currentFilterList = QUOTES;
-      renderQuotesList(QUOTES);
-      return;
-    }
-    const q = term.toLowerCase();
-    currentFilterList = QUOTES.filter(item => {
-      const txt = (item.text || item.quote || '').toLowerCase();
-      const book = (item.book || '').toLowerCase();
-      const cv = (item.chapter_verse || item.verse || '').toLowerCase();
-      return txt.includes(q) || book.includes(q) || cv.includes(q);
-    });
-    renderQuotesList(currentFilterList);
-  }
-
-  function populateBookSelect() {
-    if (!el.bookSelect) return;
-    const books = Array.from(new Set(QUOTES.map(q => q.book).filter(Boolean))).sort();
-    el.bookSelect.innerHTML = '<option value=\"\">All books</option>' + books.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
-  }
-
-  function filterByBook(book) {
-    if (!book) {
-      currentFilterList = QUOTES;
-      renderQuotesList(QUOTES);
-      return;
-    }
-    currentFilterList = QUOTES.filter(q => (q.book || '').toLowerCase() === book.toLowerCase());
-    renderQuotesList(currentFilterList);
-  }
-
-  // Event delegation for fav buttons inside containers
-  function onDocumentClick(e) {
-    const favBtn = e.target.closest('.fav-toggle');
-    if (favBtn) {
-      const id = favBtn.dataset.id;
-      toggleFavorite(id);
-      return;
-    }
-  }
-
-  // Login stub
-  function handleLoginSubmit(e) {
-    if (!el.loginForm) return;
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    // Simple client-side stub
-    el.loginMessage.textContent = `Hello ${username}, login is a stub in this demo.`;
-    el.loginForm.reset();
-  }
-
-  // Clear favorites
-  function clearFavorites() {
-    favorites = [];
-    saveFavorites();
-    renderFavorites();
-    renderRandom();
-    renderRecent();
-  }
-
-  // Initialization
-  async function init() {
-    document.addEventListener('click', onDocumentClick);
-
-    if (el.newRandomBtn) el.newRandomBtn.addEventListener('click', renderRandom);
-    if (el.saveRandomFavBtn) el.saveRandomFavBtn.addEventListener('click', () => {
-      if (!currentRandom) return;
-      const id = currentRandom.id ?? currentRandom._id ?? currentRandom.book + '|' + (currentRandom.chapter_verse || currentRandom.verse || '');
-      toggleFavorite(id);
-    });
-
-    if (el.searchBtn) el.searchBtn.addEventListener('click', () => doSearch(el.searchInput.value));
-    if (el.searchInput) el.searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') doSearch(el.searchInput.value);
-    });
-
-    if (el.filterBtn) el.filterBtn.addEventListener('click', () => filterByBook(el.bookSelect.value));
-    if (el.clearFavoritesBtn) el.clearFavoritesBtn.addEventListener('click', clearFavorites);
-    if (el.loginForm) el.loginForm.addEventListener('submit', handleLoginSubmit);
-
-  // Fetch quotes and render initial UI
-  await fetchQuotes();
-  // render today's quote (prefers explicit date match)
-  renderToday();
-    renderRecent();
-    renderQuotesList(QUOTES);
-    renderFavorites();
-  }
-
-  // Run init on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
   } else {
-    init();
+    alert("Already saved");
+  }
+}
+
+// ----------------------------
+// Render Favorites Page
+// ----------------------------
+function renderFavorites() {
+  if (!favoritesList) return;
+  const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
+  favoritesList.innerHTML = saved.map(q => `<li>${q.text} — <em>${q.reference}</em></li>`).join("");
+}
+
+// ----------------------------
+// Login / Logout
+// ----------------------------
+function checkLogin() {
+  const currentUser = localStorage.getItem("currentUser");
+  const loginLink = document.getElementById("nav-login");
+  const logoutBtn = document.getElementById("logout-btn");
+  if (currentUser) {
+    if (loginLink) loginLink.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "inline";
+  } else {
+    if (loginLink) loginLink.style.display = "inline";
+    if (logoutBtn) logoutBtn.style.display = "none";
+  }
+}
+
+function login(username) {
+  if (!username) return alert("Enter a username!");
+  localStorage.setItem("currentUser", username);
+  alert("Logged in as " + username);
+  checkLogin();
+}
+
+function logout() {
+  localStorage.removeItem("currentUser");
+  checkLogin();
+}
+
+// ----------------------------
+// Page Navigation
+// ----------------------------
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => (p.style.display = "none"));
+  const page = document.getElementById(pageId);
+  if (page) page.style.display = "block";
+
+  // Update content on page load
+  if (pageId === "home") pickTodayQuote();
+  if (pageId === "favorites") renderFavorites();
+}
+
+// Handle history navigation
+window.onpopstate = () => {
+  const path = window.location.pathname;
+  const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
+  const pageId = pages[path] || "home";
+  showPage(pageId);
+};
+
+// Setup nav links
+document.querySelectorAll("a[href^='/']").forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    history.pushState(null, "", link.getAttribute("href"));
+    const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
+    const pageId = pages[link.getAttribute("href")] || "home";
+    showPage(pageId);
+  });
+});
+
+// ----------------------------
+// Event Listeners
+// ----------------------------
+window.addEventListener("DOMContentLoaded", () => {
+  checkLogin();
+  showPage("home");
+
+  if (newRandomBtn) newRandomBtn.addEventListener("click", pickTodayQuote);
+  if (saveBtn) saveBtn.addEventListener("click", saveQuote);
+
+  const loginBtn = document.getElementById("login-btn");
+  const usernameInput = document.getElementById("username");
+  if (loginBtn && usernameInput) {
+    loginBtn.addEventListener("click", () => login(usernameInput.value));
   }
 
-})();
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+});
