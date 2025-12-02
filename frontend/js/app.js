@@ -3,136 +3,61 @@
 // ==========================
 
 const quotes = [
-  {"id":1,"text":"For God so loved the world...","reference":"John 3:16","date":"2025-12-12","category":"Love"},
-  {"id":2,"text":"Trust in the LORD with all your heart...","reference":"Proverbs 3:5","date":"2025-11-09","category":"Faith"},
-  {"id":3,"text":"The Lord is my shepherd...","reference":"Psalm 23:1","date":"2025-11-10","category":"Guidance"},
-  {"id":25,"text":"Love does no harm to a neighbor. Therefore love is the fulfillment of the law.","reference":"Romans 13:10","date":"2025-12-02","category":"Love"},
-  // add all other quotes here...
+  {"id":1,"text":"For God so loved the world...","reference":"John 3:16","date":"2025-12-02","category":"Love"},
+  {"id":2,"text":"Trust in the LORD with all your heart...","reference":"Proverbs 3:5","date":"2025-12-03","category":"Faith"},
+  {"id":3,"text":"The Lord is my shepherd...","reference":"Psalm 23:1","date":"2025-12-04","category":"Guidance"},
+  {"id":4,"text":"I can do all things through Christ who strengthens me.","reference":"Philippians 4:13","date":"2025-12-05","category":"Strength"},
+  {"id":5,"text":"Cast all your anxiety on Him because He cares for you.","reference":"1 Peter 5:7","date":"2025-12-06","category":"Comfort"},
+  {"id":6,"text":"Do everything in love.","reference":"1 Corinthians 16:14","date":"2025-12-07","category":"Love"},
+  {"id":7,"text":"Praise the LORD, my soul.","reference":"Psalm 146:1","date":"2025-12-08","category":"Worship"},
+  {"id":8,"text":"Rejoice always, pray continually, give thanks in all circumstances.","reference":"1 Thessalonians 5:16-18","date":"2025-12-09","category":"Faith"},
+  {"id":9,"text":"The LORD is near to all who call on Him.","reference":"Psalm 145:18","date":"2025-12-10","category":"Faith"},
+  {"id":10,"text":"Be still, and know that I am God.","reference":"Psalm 46:10","date":"2025-12-11","category":"Peace"},
+  {"id":11,"text":"Your word is a lamp to my feet and a light to my path.","reference":"Psalm 119:105","date":"2025-12-12","category":"Guidance"},
+  {"id":12,"text":"Do not let your hearts be troubled.","reference":"John 14:1","date":"2025-12-13","category":"Comfort"},
+  {"id":13,"text":"Walk in love, as Christ loved us and gave Himself up for us.","reference":"Ephesians 5:2","date":"2025-12-14","category":"Love"},
+  {"id":14,"text":"Rejoice in the Lord always. I will say it again: Rejoice!","reference":"Philippians 4:4","date":"2025-12-15","category":"Joy"},
+  {"id":15,"text":"Blessed are the peacemakers, for they will be called children of God.","reference":"Matthew 5:9","date":"2025-12-16","category":"Peace"},
+  {"id":16,"text":"Love does no harm to a neighbor. Therefore love is the fulfillment of the law.","reference":"Romans 13:10","date":"2025-12-17","category":"Love"},
+  {"id":17,"text":"The LORD is compassionate and gracious, slow to anger, abounding in love.","reference":"Psalm 103:8","date":"2025-12-18","category":"Faith"},
+  {"id":18,"text":"Let everything that has breath praise the LORD.","reference":"Psalm 150:6","date":"2025-12-19","category":"Worship"},
+  {"id":19,"text":"Blessed are those who hunger and thirst for righteousness, for they will be filled.","reference":"Matthew 5:6","date":"2025-12-20","category":"Faith"},
+  {"id":20,"text":"Trust in Him at all times, you people; pour out your hearts to Him.","reference":"Psalm 62:8","date":"2025-12-21","category":"Faith"},
+  {"id":21,"text":"Delight yourself in the LORD, and He will give you the desires of your heart.","reference":"Psalm 37:4","date":"2025-12-22","category":"Faith"},
+  {"id":22,"text":"God is our refuge and strength, an ever-present help in trouble.","reference":"Psalm 46:1","date":"2025-12-23","category":"Comfort"},
+  {"id":23,"text":"Therefore encourage one another and build each other up.","reference":"1 Thessalonians 5:11","date":"2025-12-24","category":"Encouragement"},
+  {"id":24,"text":"Faith is confidence in what we hope for and assurance about what we do not see.","reference":"Hebrews 11:1","date":"2025-12-25","category":"Faith"},
+  {"id":25,"text":"Cast your burden on the LORD, and He will sustain you.","reference":"Psalm 55:22","date":"2025-12-26","category":"Comfort"},
+  {"id":26,"text":"Be strong in the Lord and in His mighty power.","reference":"Ephesians 6:10","date":"2025-12-27","category":"Strength"},
+  {"id":27,"text":"Do not be overcome by evil, but overcome evil with good.","reference":"Romans 12:21","date":"2025-12-28","category":"Guidance"},
+  {"id":28,"text":"Serve wholeheartedly, as if you were serving the Lord.","reference":"Ephesians 6:7","date":"2025-12-29","category":"Faith"},
+  {"id":29,"text":"Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.","reference":"Galatians 6:9","date":"2025-12-30","category":"Perseverance"},
+  {"id":30,"text":"Commit your way to the LORD; trust in Him and He will act.","reference":"Psalm 37:5","date":"2025-12-31","category":"Faith"}
 ];
 
 let todayQuote = null;
 
-// DOM Elements
-const todayQuoteDiv = document.getElementById("today-quote");
-const newRandomBtn = document.getElementById("new-random-quote");
-const saveBtn = document.getElementById("save-random-fav");
-const favoritesList = document.getElementById("favorites-list");
-
-// ----------------------------
-// Display Quote of the Day
-// ----------------------------
 function displayQuote(quote) {
-  if (!todayQuoteDiv || !quote) return;
-  todayQuoteDiv.innerHTML = `<blockquote>${quote.text}</blockquote><p><em>${quote.reference}</em></p>`;
+  const container = document.getElementById('today-quote');
+  container.innerHTML = `<blockquote>${quote.text}</blockquote><p><em>${quote.reference}</em></p>`;
+  todayQuote = quote;
 }
 
-function pickTodayQuote() {
-  const today = new Date().toISOString().slice(0, 10);
-  todayQuote = quotes.find(q => q.date === today) || quotes[Math.floor(Math.random() * quotes.length)];
-  displayQuote(todayQuote);
+// Get today's date as YYYY-MM-DD
+function getToday() {
+  return new Date().toISOString().slice(0, 10);
 }
 
-// ----------------------------
-// Save quote to favorites
-// ----------------------------
-function saveQuote() {
-  if (!todayQuote) return;
-  const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
-  if (!saved.some(q => q.id === todayQuote.id)) {
-    saved.push(todayQuote);
-    localStorage.setItem("savedQuotes", JSON.stringify(saved));
-    alert("Quote saved!");
-    renderFavorites();
-  } else {
-    alert("Already saved");
-  }
+// Pick the quote of the day (if available) or a random future quote
+function pickQuoteOfTheDay() {
+  const today = getToday();
+  const futureQuotes = quotes.filter(q => q.date >= today);
+  const quote = futureQuotes[Math.floor(Math.random() * futureQuotes.length)];
+  displayQuote(quote);
 }
 
-// ----------------------------
-// Render Favorites Page
-// ----------------------------
-function renderFavorites() {
-  if (!favoritesList) return;
-  const saved = JSON.parse(localStorage.getItem("savedQuotes") || "[]");
-  favoritesList.innerHTML = saved.map(q => `<li>${q.text} — <em>${q.reference}</em></li>`).join("");
-}
+// Button for new random quote
+document.getElementById('new-random-quote').addEventListener('click', pickQuoteOfTheDay);
 
-// ----------------------------
-// Login / Logout
-// ----------------------------
-function checkLogin() {
-  const currentUser = localStorage.getItem("currentUser");
-  const loginLink = document.getElementById("nav-login");
-  const logoutBtn = document.getElementById("logout-btn");
-  if (currentUser) {
-    if (loginLink) loginLink.style.display = "none";
-    if (logoutBtn) logoutBtn.style.display = "inline";
-  } else {
-    if (loginLink) loginLink.style.display = "inline";
-    if (logoutBtn) logoutBtn.style.display = "none";
-  }
-}
-
-function login(username) {
-  if (!username) return alert("Enter a username!");
-  localStorage.setItem("currentUser", username);
-  alert("Logged in as " + username);
-  checkLogin();
-}
-
-function logout() {
-  localStorage.removeItem("currentUser");
-  checkLogin();
-}
-
-// ----------------------------
-// Page Navigation
-// ----------------------------
-function showPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => (p.style.display = "none"));
-  const page = document.getElementById(pageId);
-  if (page) page.style.display = "block";
-
-  // Update content on page load
-  if (pageId === "home") pickTodayQuote();
-  if (pageId === "favorites") renderFavorites();
-}
-
-// Handle history navigation
-window.onpopstate = () => {
-  const path = window.location.pathname;
-  const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
-  const pageId = pages[path] || "home";
-  showPage(pageId);
-};
-
-// Setup nav links
-document.querySelectorAll("a[href^='/']").forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    history.pushState(null, "", link.getAttribute("href"));
-    const pages = { "/": "home", "/favorites": "favorites", "/login": "login" };
-    const pageId = pages[link.getAttribute("href")] || "home";
-    showPage(pageId);
-  });
-});
-
-// ----------------------------
-// Event Listeners
-// ----------------------------
-window.addEventListener("DOMContentLoaded", () => {
-  checkLogin();
-  showPage("home");
-
-  if (newRandomBtn) newRandomBtn.addEventListener("click", pickTodayQuote);
-  if (saveBtn) saveBtn.addEventListener("click", saveQuote);
-
-  const loginBtn = document.getElementById("login-btn");
-  const usernameInput = document.getElementById("username");
-  if (loginBtn && usernameInput) {
-    loginBtn.addEventListener("click", () => login(usernameInput.value));
-  }
-
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) logoutBtn.addEventListener("click", logout);
-});
+// Initial load
+window.addEventListener('DOMContentLoaded', pickQuoteOfTheDay);

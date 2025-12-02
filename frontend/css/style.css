@@ -1,145 +1,74 @@
 /*
-|--------------------------------------------------------------------------
-| CSS Reset & Base Styles
-|--------------------------------------------------------------------------
-| Applying a light reset and setting a legible base font size.
+  Professional unified stylesheet for Biblical Quotes frontend
+  Applies a clean, modern layout and consistent styling across pages
 */
-:root {
-  /* Define a color palette for consistency */
-  --color-primary: #5d4037;    /* Deep Brown/Earthy Tone for emphasis */
-  --color-secondary: #795548;  /* Lighter Brown/Warm Accent */
-  --color-background: #fdf6e3; /* Soft, Creamy Off-White */
-  --color-text: #333333;       /* Dark text for high contrast */
-  --color-light-text: #ffffff; /* White text for headers/dark backgrounds */
+
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0f5460; /* deep teal */
+  --accent-2:#125e9a; /* blue accent */
+  --border:rgba(15,84,96,0.08);
+  --radius:10px;
+  --max-width:1100px;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box; /* Ensures padding and border don't increase the element's total width/height */
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,Segoe UI,system-ui,-apple-system,'Helvetica Neue',Arial;line-height:1.5;background:var(--bg);color:#111}
+
+/* Page shell */
+.site{max-width:var(--max-width);margin:28px auto;padding:20px}
+header.site-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border-radius:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{margin:0;font-size:1.25rem;letter-spacing:0.3px}
+.brand .logo{width:42px;height:42px;border-radius:8px;background:#fff3;display:inline-block}
+
+nav.main-nav{display:flex;gap:12px}
+nav.main-nav a{color:rgba(255,255,255,0.95);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;transition:background 160ms}
+nav.main-nav a:hover{background:rgba(255,255,255,0.08)}
+
+/* Layout */
+main{display:block;margin-top:18px}
+.page-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 6px 20px rgba(16,24,40,0.04)}
+
+/* Today quote */
+#today-quote{min-height:120px;display:flex;flex-direction:column;justify-content:center}
+.quote-card{padding:18px;border-radius:8px;background:linear-gradient(180deg,#fff,#fcfcff);border:1px solid rgba(0,0,0,0.04)}
+.quote-text{font-size:1.15rem;font-weight:600;color:#0b2230;margin:0 0 8px}
+.quote-meta{font-size:0.95rem;color:var(--muted);margin:0}
+.quote-actions{margin-top:12px;display:flex;gap:8px}
+
+/* Buttons & inputs */
+button, .btn{background:var(--accent);color:#fff;border:0;padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+button.ghost{background:transparent;border:1px solid var(--border);color:var(--accent)}
+input[type=text], input[type=search], input[type=password], select{padding:10px 12px;border-radius:8px;border:1px solid rgba(15,21,30,0.06);width:100%;max-width:420px}
+
+/* Lists */
+#recent-quotes-list, #quotes-container, #favorites-container, #favorites-list{display:flex;flex-direction:column;gap:12px}
+.quote-item{background:#fff;border-radius:8px;padding:12px;border:1px solid var(--border)}
+.quote-item p{margin:0}
+
+/* Blockquote styles for legacy markup */
+blockquote{margin:0 0 8px 0;padding-left:14px;border-left:4px solid rgba(0,0,0,0.06);color:var(--accent-2);font-style:italic}
+
+/* Forms */
+.form-row{display:flex;gap:12px;align-items:center}
+.form-row .grow{flex:1}
+
+/* Responsive */
+@media(min-width:900px){
+  main.grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+  #recent-quotes-list{max-height:520px;overflow:auto}
 }
 
-body {
-  font-family: 'Georgia', 'Times New Roman', Times, serif; /* Dignified, legible serif font */
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  min-height: 100vh; /* Ensures body takes full height for potential footer/centering */
+@media(max-width:600px){
+  header.site-header{flex-direction:column;align-items:flex-start;gap:12px}
+  .brand h1{font-size:1.05rem}
 }
 
-/*
-|--------------------------------------------------------------------------
-| Header & Navigation
-|--------------------------------------------------------------------------
-| Simple, solid header with clean navigation.
-*/
-header {
-  background-color: var(--color-primary);
-  color: var(--color-light-text);
-  padding: 15px 30px; /* Increased padding for more visual weight */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-.nav-link { /* Use a class for clarity, if possible */
-  color: var(--color-light-text);
-  margin-right: 20px;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: color 0.3s ease; /* Smooth hover effect */
-}
-
-.nav-link:hover {
-  color: #ffcc80; /* A soft gold/amber on hover */
-}
-
-/*
-|--------------------------------------------------------------------------
-| Main Content Layout
-|--------------------------------------------------------------------------
-| Using flexbox to optionally center the content block on the page.
-*/
-main {
-  display: flex;
-  justify-content: center; /* Center the quote block horizontally */
-  align-items: center;    /* Center the quote block vertically (if needed, use min-height on main) */
-  padding: 40px 20px;
-}
-
-.quote-container {
-  /* This container holds the blockquote and citation, making it a cohesive element */
-  max-width: 700px; /* Constrain width for better readability */
-  width: 100%;
-  background-color: #ffffff; /* White background for the quote card */
-  padding: 40px;
-  border-radius: 8px; /* Slightly rounded corners */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* More noticeable, professional shadow */
-  border-top: 5px solid var(--color-secondary); /* A themed accent line */
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Blockquote Styling (The Quote Itself)
-|--------------------------------------------------------------------------
-| The primary focus: the quote.
-*/
-blockquote {
-  font-size: 1.6em; /* Larger, more impactful font size */
-  font-style: italic;
-  margin: 0 0 20px 0; /* Adjusted margin for better flow */
-  padding-left: 20px; /* Increased padding for visual separation */
-  border-left: 5px solid var(--color-secondary); /* Thicker, thematic border color */
-  position: relative;
-  color: var(--color-primary); /* Use the primary color for the quote text */
-}
-
-/* Optional: Add decorative opening quote marks */
-blockquote::before {
-  content: '“';
-  font-size: 4em;
-  color: rgba(93, 64, 55, 0.1); /* Very faint color for a watermark effect */
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  line-height: 1;
-  z-index: 0;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Citation Styling
-|--------------------------------------------------------------------------
-*/
-.citation {
-  display: block;
-  text-align: right;
-  font-size: 1.1em;
-  font-weight: 600; /* Bolder for clarity */
-  color: var(--color-secondary);
-  margin-top: 20px;
-  padding-top: 10px;
-  border-top: 1px dashed #e0e0e0; /* Subtle visual separator */
-}
-
-/* Additional card styles for quote-of-the-day and lists */
-#today-quote, .quote-card {
-  background: #fff;
-  border: 1px solid #ececec;
-  border-radius: 6px;
-  padding: 18px;
-  margin: 12px 0;
-}
-.quote-text { font-size: 1.125rem; margin: 0 0 8px; color: var(--color-primary); }
-.quote-meta { color: #666; font-size: 0.95rem; margin: 0 }
-.quote-actions { margin-top: 10px }
-button { background: var(--color-primary); color: var(--color-light-text); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer }
-
-/* Fav list */
-#favorites-list { list-style: none; padding-left: 0 }
-#favorites-list li { margin-bottom: 10px }
-
-@media (min-width: 800px) {
-  main { padding: 60px 20px }
-  .quote-container { padding: 48px }
-}
+/* helper */
+.muted{color:var(--muted)}
+.text-right{text-align:right}
