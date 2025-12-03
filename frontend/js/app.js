@@ -35,29 +35,64 @@ const quotes = [
   {"id":30,"text":"Commit your way to the LORD; trust in Him and He will act.","reference":"Psalm 37:5","date":"2025-12-31","category":"Faith"}
 ];
 
+
 let todayQuote = null;
+
+function getToday() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
 
 function displayQuote(quote) {
   const container = document.getElementById('today-quote');
+  if (!container) return;
   container.innerHTML = `<blockquote>${quote.text}</blockquote><p><em>${quote.reference}</em></p>`;
   todayQuote = quote;
 }
 
-// Get today's date as YYYY-MM-DD
-function getToday() {
-  return new Date().toISOString().slice(0, 10);
-}
 
-// Pick the quote of the day (if available) or a random future quote
-function pickQuoteOfTheDay() {
+function pickTodayQuote() {
   const today = getToday();
-  const futureQuotes = quotes.filter(q => q.date >= today);
-  const quote = futureQuotes[Math.floor(Math.random() * futureQuotes.length)];
-  displayQuote(quote);
+  const quote = quotes.find(q => q.date === today);
+  if (quote) {
+    displayQuote(quote);
+  } else {
+    // fallback: show a random quote
+    pickRandomQuote(true);
+  }
 }
 
-// Button for new random quote
-document.getElementById('new-random-quote').addEventListener('click', pickQuoteOfTheDay);
+function pickRandomQuote(allowToday = false) {
+  const today = getToday();
+  let pool = allowToday ? quotes : quotes.filter(q => q.date !== today);
+  if (pool.length === 0) pool = quotes;
+  const randomIndex = Math.floor(Math.random() * pool.length);
+  displayQuote(pool[randomIndex]);
+}
 
-// Initial load
-window.addEventListener('DOMContentLoaded', pickQuoteOfTheDay);
+// Wait until DOM is fully loaded
+window.addEventListener('DOMContentLoaded', () => {
+  // Show today's quote on load
+  pickTodayQuote();
+
+  // New Random Quote button
+  const newQuoteBtn = document.getElementById('new-random-quote');
+  if (newQuoteBtn) {
+    newQuoteBtn.addEventListener('click', () => pickRandomQuote(false));
+  }
+
+  // Save to Favorites button
+  const saveBtn = document.getElementById('save-random-fav');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      if (!todayQuote) return;
+      let saved = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+      if (!saved.some(q => q.id === todayQuote.id)) {
+        saved.push(todayQuote);
+        localStorage.setItem('savedQuotes', JSON.stringify(saved));
+        alert('Quote saved!');
+      } else {
+        alert('Already saved');
+      }
+    });
+  }
+});

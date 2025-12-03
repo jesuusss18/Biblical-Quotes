@@ -1,74 +1,300 @@
-/*
-  Professional unified stylesheet for Biblical Quotes frontend
-  Applies a clean, modern layout and consistent styling across pages
-*/
+/* Biblical Quotes - Professional Modern CSS */
+/* Font import (Inter, fallback to Roboto, Helvetica, Arial) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --accent:#0f5460; /* deep teal */
-  --accent-2:#125e9a; /* blue accent */
-  --border:rgba(15,84,96,0.08);
-  --radius:10px;
-  --max-width:1100px;
+:root {
+  --color-bg: #f7fafd;
+  --color-surface: #fff;
+  --color-surface-alt: #f1f5f9;
+  --color-primary: #2563eb;
+  --color-primary-dark: #1e40af;
+  --color-accent: #38bdf8;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --radius: 12px;
+  --shadow: 0 2px 16px 0 rgba(30, 64, 175, 0.07);
+  --transition: 0.18s cubic-bezier(.4,0,.2,1);
+  --font-main: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Reset & base */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:Inter,Segoe UI,system-ui,-apple-system,'Helvetica Neue',Arial;line-height:1.5;background:var(--bg);color:#111}
-
-/* Page shell */
-.site{max-width:var(--max-width);margin:28px auto;padding:20px}
-header.site-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border-radius:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand h1{margin:0;font-size:1.25rem;letter-spacing:0.3px}
-.brand .logo{width:42px;height:42px;border-radius:8px;background:#fff3;display:inline-block}
-
-nav.main-nav{display:flex;gap:12px}
-nav.main-nav a{color:rgba(255,255,255,0.95);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;transition:background 160ms}
-nav.main-nav a:hover{background:rgba(255,255,255,0.08)}
-
-/* Layout */
-main{display:block;margin-top:18px}
-.page-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 6px 20px rgba(16,24,40,0.04)}
-
-/* Today quote */
-#today-quote{min-height:120px;display:flex;flex-direction:column;justify-content:center}
-.quote-card{padding:18px;border-radius:8px;background:linear-gradient(180deg,#fff,#fcfcff);border:1px solid rgba(0,0,0,0.04)}
-.quote-text{font-size:1.15rem;font-weight:600;color:#0b2230;margin:0 0 8px}
-.quote-meta{font-size:0.95rem;color:var(--muted);margin:0}
-.quote-actions{margin-top:12px;display:flex;gap:8px}
-
-/* Buttons & inputs */
-button, .btn{background:var(--accent);color:#fff;border:0;padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:600}
-button.ghost{background:transparent;border:1px solid var(--border);color:var(--accent)}
-input[type=text], input[type=search], input[type=password], select{padding:10px 12px;border-radius:8px;border:1px solid rgba(15,21,30,0.06);width:100%;max-width:420px}
-
-/* Lists */
-#recent-quotes-list, #quotes-container, #favorites-container, #favorites-list{display:flex;flex-direction:column;gap:12px}
-.quote-item{background:#fff;border-radius:8px;padding:12px;border:1px solid var(--border)}
-.quote-item p{margin:0}
-
-/* Blockquote styles for legacy markup */
-blockquote{margin:0 0 8px 0;padding-left:14px;border-left:4px solid rgba(0,0,0,0.06);color:var(--accent-2);font-style:italic}
-
-/* Forms */
-.form-row{display:flex;gap:12px;align-items:center}
-.form-row .grow{flex:1}
-
-/* Responsive */
-@media(min-width:900px){
-  main.grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
-  #recent-quotes-list{max-height:520px;overflow:auto}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: #222;
+  min-height: 100vh;
 }
 
-@media(max-width:600px){
-  header.site-header{flex-direction:column;align-items:flex-start;gap:12px}
-  .brand h1{font-size:1.05rem}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* helper */
-.muted{color:var(--muted)}
-.text-right{text-align:right}
+/* Navigation Bar */
+header {
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px 0 rgba(30, 64, 175, 0.04);
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 0 18px;
+  min-height: 60px;
+}
+
+nav a {
+  color: var(--color-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.08rem;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  transition: background var(--transition), color var(--transition);
+  position: relative;
+}
+
+nav a:hover,
+nav a:focus {
+  background: var(--color-surface-alt);
+  color: var(--color-primary);
+}
+
+nav a.active,
+nav a[aria-current="page"] {
+  color: var(--color-primary-dark);
+  background: var(--color-accent);
+  box-shadow: 0 2px 8px 0 rgba(56, 189, 248, 0.08);
+}
+
+/* Main Layout */
+.site-container {
+  flex: 1 1 auto;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (max-width: 900px) {
+  .site-container {
+    max-width: 98vw;
+    padding: 0 4vw 32px 4vw;
+  }
+}
+
+@media (max-width: 600px) {
+  nav {
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 4vw;
+  }
+  .site-container {
+    gap: 20px;
+    padding-bottom: 18px;
+  }
+}
+
+/* Quote Block */
+#today-quote, .quote-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px 28px 24px 28px;
+  margin: 0 0 18px 0;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+
+#today-quote {
+  min-height: 120px;
+}
+
+.quote-card {
+  margin: 0 0 12px 0;
+}
+
+.quote-text, blockquote {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-primary-dark);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+blockquote {
+  padding-left: 18px;
+  border-left: 4px solid var(--color-accent);
+  background: none;
+}
+
+.quote-meta, .quote-ref, .quote-author {
+  color: var(--color-muted);
+  font-size: 1.05rem;
+  margin: 0 0 4px 0;
+  font-style: normal;
+}
+
+.quote-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  #today-quote, .quote-card {
+    padding: 18px 10px 14px 10px;
+  }
+  .quote-text, blockquote {
+    font-size: 1.08rem;
+  }
+}
+
+/* Buttons */
+button, .btn {
+  font-family: var(--font-main);
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 22px;
+  margin: 0;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+  box-shadow: 0 1px 4px 0 rgba(30, 64, 175, 0.04);
+  outline: none;
+  display: inline-block;
+}
+
+button:active, .btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-primary, button#save-random-fav {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-primary:hover, button#save-random-fav:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-accent, button#new-random-quote {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn-accent:hover, button#new-random-quote:hover {
+  background: #0ea5e9;
+}
+
+button:disabled, .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Login Form */
+form, .login-form {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 24px 20px 24px;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border: 1px solid var(--color-border);
+}
+
+form label {
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  margin-bottom: 6px;
+}
+
+input[type='text'], input[type='password'], input[type='search'] {
+  font-family: var(--font-main);
+  font-size: 1.08rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  background: var(--color-surface-alt);
+  color: #222;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input[type='text']:focus, input[type='password']:focus, input[type='search']:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-accent);
+  outline: none;
+}
+
+/* Favorites List */
+#favorites-list, .favorites-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#favorites-list li, .favorites-list li {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 18px 14px 18px;
+  border: 1px solid var(--color-border);
+  font-size: 1.08rem;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#favorites-list li .quote-ref, .favorites-list li .quote-ref {
+  color: var(--color-muted);
+  font-size: 0.98rem;
+}
+
+/* Utility & Feedback */
+.muted, .text-muted {
+  color: var(--color-muted) !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+@media (max-width: 500px) {
+  form, .login-form, #favorites-list li, .favorites-list li {
+    padding: 12px 6px 10px 6px;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, .btn, input, nav a {
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
