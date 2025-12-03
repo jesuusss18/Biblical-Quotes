@@ -82,7 +82,6 @@ docker-compose up --build
 
 # ☁️ **Minimal Deployment (Google Cloud Run)**
 
-*(as simple as possible)*
 
 ### **Frontend**
 
